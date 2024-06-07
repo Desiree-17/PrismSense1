@@ -191,8 +191,15 @@ class FilterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filter Page'),
+        centerTitle: true,
+        title: Image.asset(
+          'images/appbarlogo4.png',
+          fit: BoxFit.contain,
+          height: 27,
+        ),
         backgroundColor: const Color(0xFF534F7D),
+        iconTheme: IconThemeData(color: Colors.white),
+        // Change back button color to white
       ),
       body: SafeArea(
         child: Stack(
