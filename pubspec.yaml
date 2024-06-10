@@ -86,6 +86,9 @@ flutter:
     - images/plate23.png
     - images/plate24.png
     - images/plate25.png
+    - images/first.png
+    - images/second.png
+    - images/third.png
 
     - images/Color_Variations_Dataset.csv
     
