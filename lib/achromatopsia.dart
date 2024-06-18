@@ -1243,7 +1243,7 @@ class _AchromatopsiaPageState extends State<AchromatopsiaPage> {
           // Background image
           Positioned.fill(
             child: Image.asset(
-              'images/bg.png', // Replace with your background image path
+              'images/bg6.png', // Replace with your background image path
               fit: BoxFit.cover,
             ),
           ),
@@ -1321,9 +1321,13 @@ class _AchromatopsiaPageState extends State<AchromatopsiaPage> {
                     onPressed: _applyAchromatopsiaFilter,
                     child: const Text(
                       'Convert Image',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF534F7D),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

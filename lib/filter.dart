@@ -207,7 +207,7 @@ class FilterPage extends StatelessWidget {
             // Background image
             Positioned.fill(
               child: Image.asset(
-                'images/bg.png', // Replace with your background image path
+                'images/bg6.png', // Replace with your background image path
                 fit: BoxFit.cover,
               ),
             ),

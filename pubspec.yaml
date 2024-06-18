@@ -25,13 +25,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.11.0
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "images/finalicon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -41,10 +41,13 @@ flutter:
   uses-material-design: true
   assets:
     - images/background.png
+    - images/finalicon.png
     - images/launch_image.png
     - images/logoonly.png
     - images/bg.png
     - images/bg1.png
+    - images/bg5.png
+    - images/bg6.png
     - images/codegeass.png
     - images/icon.png
     - images/name.png
@@ -82,10 +85,6 @@ flutter:
     - images/plate19.png
     - images/plate20.png
     - images/plate21.png
-    - images/plate22.png
-    - images/plate23.png
-    - images/plate24.png
-    - images/plate25.png
     - images/first.png
     - images/second.png
     - images/third.png
