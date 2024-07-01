@@ -305,7 +305,6 @@
 // }
 
 // ignore_for_file: prefer_const_constructors
-
 import 'dart:async';
 import 'dart:math';
 import 'package:camera/camera.dart';
@@ -313,9 +312,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class ColorData {
-  final int r, g, b;
+  final double h, s, v;
   final String label;
-  ColorData(this.r, this.g, this.b, this.label);
+  ColorData(this.h, this.s, this.v, this.label);
 }
 
 class CameraPage extends StatefulWidget {
@@ -380,13 +379,13 @@ class _CameraPageState extends State<CameraPage> {
         int g = int.parse(values[1].trim());
         int b = int.parse(values[2].trim());
         String label = values[3].trim();
-        colorDataset.add(ColorData(r, g, b, label));
+        List<double> hsv = rgbToHsv(r, g, b);
+        colorDataset.add(ColorData(hsv[0], hsv[1], hsv[2], label));
       }
     }
   }
 
   void _processCameraImage(CameraImage image) {
-    print("Format: ${image.format.group}");
     if (DateTime.now().difference(lastProcessedTime).inSeconds < 2) return;
     final int centerX = (image.width / 2).round();
     final int centerY = (image.height / 2).round();
@@ -398,44 +397,53 @@ class _CameraPageState extends State<CameraPage> {
     final u = image.planes[1].bytes[uvIndex];
     final v = image.planes[2].bytes[uvIndex];
 
-    // Print YUV values before processing
-    print("YUV Values: Y=$y, U=$u, V=$v");
-
     int r = (y + 1.402 * (v - 128)).round().clamp(0, 255);
     int g =
         (y - 0.344136 * (u - 128) - 0.714136 * (v - 128)).round().clamp(0, 255);
     int b = (y + 1.772 * (u - 128)).round().clamp(0, 255);
 
-    // Print RGB values after conversion
-    print("Converted RGB Values: R=$r, G=$g, B=$b");
-
-    List<int> normalized = normalizeColor(r, g, b);
+    List<double> hsv = rgbToHsv(r, g, b);
     setState(() {
-      predictedColor =
-          classifyColor(normalized[0], normalized[1], normalized[2]);
+      predictedColor = classifyColor(hsv[0], hsv[1], hsv[2]);
       lastProcessedTime = DateTime.now();
-
-      // Print predicted color
-      print("Predicted Color: $predictedColor");
     });
   }
 
-  List<int> normalizeColor(int r, int g, int b) {
-    int maxColor = max(r, max(g, b));
-    return [
-      ((r / maxColor) * 255).round(),
-      ((g / maxColor) * 255).round(),
-      ((b / maxColor) * 255).round()
-    ];
+  List<double> rgbToHsv(int r, int g, int b) {
+    double rPrim = r / 255.0;
+    double gPrim = g / 255.0;
+    double bPrim = b / 255.0;
+
+    double cMax = [rPrim, gPrim, bPrim].reduce(max);
+    double cMin = [rPrim, gPrim, bPrim].reduce(min);
+    double delta = cMax - cMin;
+
+    double h = 0.0;
+    if (delta != 0) {
+      if (cMax == rPrim) {
+        h = 60 * (((gPrim - bPrim) / delta) % 6);
+      } else if (cMax == gPrim) {
+        h = 60 * (((bPrim - rPrim) / delta) + 2);
+      } else if (cMax == bPrim) {
+        h = 60 * (((rPrim - gPrim) / delta) + 4);
+      }
+    }
+
+    double s = cMax == 0 ? 0 : (delta / cMax);
+    double v = cMax;
+
+    if (h < 0) {
+      h += 360;
+    }
+
+    return [h, s, v];
   }
 
-  String classifyColor(int r, int g, int b) {
+  String classifyColor(double h, double s, double v) {
     List<Map<String, dynamic>> distances = [];
     for (var color in colorDataset) {
-      double distance = ((r - color.r) * (r - color.r) +
-              (g - color.g) * (g - color.g) +
-              (b - color.b) * (b - color.b))
-          .toDouble();
+      double distance =
+          sqrt(pow(h - color.h, 2) + pow(s - color.s, 2) + pow(v - color.v, 2));
       distances.add({'distance': distance, 'label': color.label});
     }
     distances.sort((a, b) => a['distance'].compareTo(b['distance']));
@@ -494,7 +502,10 @@ class _CameraPageState extends State<CameraPage> {
                                 FloatingActionButton(
                                     onPressed: _toggleFlash,
                                     backgroundColor: Color(0xFF534F7D),
-                                    child: Icon(Icons.flash_off,
+                                    child: Icon(
+                                        _isFlashOn
+                                            ? Icons.flash_on
+                                            : Icons.flash_off,
                                         color: Colors.white)),
                                 SizedBox(height: 16),
                                 FloatingActionButton(
@@ -574,6 +585,7 @@ class _CameraPageState extends State<CameraPage> {
       _isFrontCamera = !_isFrontCamera;
       _isCameraChanging = false;
     });
+    _controller.startImageStream(_processCameraImage);
   }
 
   void _zoomIn() {
@@ -611,6 +623,7 @@ class CrosshairPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+
 
 // import 'dart:async';
 // // ignore: unused_import
